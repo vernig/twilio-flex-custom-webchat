@@ -44,3 +44,5 @@ The frontend chat is only provided to test the middleware. If you want to integr
 * Click on the [Send] Button
 * A new message will appear in the browser and a new reservation will be created in Flex
 * Accept the reservation and start chatting... 
+
+![image](https://user-images.githubusercontent.com/54728384/70626271-08c4d200-1c1c-11ea-838c-654ec959e949.png)
