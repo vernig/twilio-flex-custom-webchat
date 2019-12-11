@@ -2,8 +2,6 @@
 
 ## Implementation
 
-### Provisioning
-
 ### Sending Message
 
 ![image](https://user-images.githubusercontent.com/54728384/70634637-7841be00-1c2a-11ea-8326-5a53dc75a2a1.png)
