@@ -1,0 +1,17 @@
+{
+  "name": "flex-custom-channel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "clean-up.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "inquirer": "^7.0.0",
+    "twilio": "^3.38.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
