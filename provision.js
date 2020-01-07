@@ -5,7 +5,7 @@ const fs = require('fs');
 Inquirer.prompt([
   {
     type: 'string',
-    name: 'twilioAccountSID',
+    name: 'twilioAccountSid',
     message: 'Twilio Account SID'
   },
   {
@@ -43,7 +43,7 @@ Inquirer.prompt([
     .create(flowOptions)
     .then(flexFlow => {
       console.log(`Created Flex Flow ${flexFlow.sid}`);
-      envFileContent = `TWILIO_ACCOUNT_SID=${answers.twilioAccountSID}\n` 
+      envFileContent = `TWILIO_ACCOUNT_SID=${answers.twilioAccountSid}\n` 
         + `TWILIO_AUTH_TOKEN=${answers.twilioAuthToken}\n`
         + `FLEX_FLOW_SID=${flexFlow.sid}\n`
         + `FLEX_CHAT_SERVICE=${answers.flexChatServiceSid}`
