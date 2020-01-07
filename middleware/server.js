@@ -23,10 +23,16 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/new-message', function(request, response) {
-  console.log('New message from Flex');
+  console.log('Twilio new message webhook fired');
   if (request.body.Source === 'SDK' ) {
     io.emit('chat message', request.body.Body);
   }
+  response.sendStatus(200);
+});
+
+app.post('/channel-update', function(request, response) {
+  console.log('Twilio channel update webhook fired');
+  console.log('Channel Status: ' + JSON.parse(request.body.Attributes).status)
   response.sendStatus(200);
 });
 

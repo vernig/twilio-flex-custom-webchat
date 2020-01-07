@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 const { URLSearchParams } = require('url');
 var base64 = require('base-64');
 
-const chatUserName = 'guest';
 const client = require('twilio')(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
@@ -11,7 +10,8 @@ const client = require('twilio')(
 
 var flexChannel;
 
-function sendChatMessage(serviceSid, channelSid, body) {
+function sendChatMessage(serviceSid, channelSid, chatUserName, body) {
+  console.log('Sending new chat message');
   const params = new URLSearchParams();
   params.append('Body', body);
   params.append('From', chatUserName);
@@ -22,42 +22,65 @@ function sendChatMessage(serviceSid, channelSid, body) {
       body: params,
       headers: {
         'X-Twilio-Webhook-Enabled': 'true',
-        Authorization: `Basic ${base64.encode(`${ process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`)}`
+        Authorization: `Basic ${base64.encode(
+          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
+        )}`
       }
     }
-  )
+  );
 }
 
-function createNewChannel() {
+function createNewChannel(flexFlowSid, flexChatService, chatUserName) {
   return client.flexApi.channel
     .create({
-      flexFlowSid: process.env.FLEX_FLOW_SID,
+      // flexFlowSid: process.env.FLEX_FLOW_SID,
+      flexFlowSid: flexFlowSid,
       identity: chatUserName,
       chatUserFriendlyName: chatUserName,
       chatFriendlyName: 'Flex Custom Chat',
-      target: 'custom-' + (new Date()).getTime() // Using Date() to randomize Flexh Flow Channel name
+      target: chatUserName
     })
     .then(channel => {
       console.log(`Created new channel ${channel.sid}`);
       return client.chat
-        .services(process.env.FLEX_CHAT_SERVICE)
+        .services(flexChatService)
         .channels(channel.sid)
         .webhooks.create({
           type: 'webhook',
           'configuration.method': 'POST',
           'configuration.url': `${process.env.WEBHOOK_BASE_URL}/new-message?channel=${channel.sid}`,
           'configuration.filters': ['onMessageSent']
-        });
+        })
+        .then(() => client.chat
+        .services(flexChatService)
+        .channels(channel.sid)
+        .webhooks.create({
+          type: 'webhook',
+          'configuration.method': 'POST',
+          'configuration.url': `${process.env.WEBHOOK_BASE_URL}/channel-update`,
+          'configuration.filters': ['onChannelUpdated']
+        }))
     })
     .then(webhook => webhook.channelSid)
-    .catch(error => {console.log(error)})
+    .catch(error => {
+      console.log(error);
+    });
 }
 
 async function sendMessageToFlex(msg) {
   if (!flexChannel) {
-    flexChannel = await createNewChannel();
+    flexChannel = await createNewChannel(
+      process.env.FLEX_FLOW_SID,
+      process.env.FLEX_CHAT_SERVICE,
+      'custom-chat-user'
+    );
   }
-  sendChatMessage(process.env.FLEX_CHAT_SERVICE, flexChannel, msg);
+  sendChatMessage(
+    process.env.FLEX_CHAT_SERVICE,
+    flexChannel,
+    'socketio-chat-user',
+    msg
+  );
 }
 
 module.exports = sendMessageToFlex;
