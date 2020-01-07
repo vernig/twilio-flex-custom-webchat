@@ -1,5 +1,11 @@
 # Integrating a custom web chat channel in Flex 
 
+## Implementation
+
+### Sending Message
+
+![image](https://user-images.githubusercontent.com/54728384/70634637-7841be00-1c2a-11ea-8326-5a53dc75a2a1.png)
+
 ## Provision your instance
 * (optional) Create a new Studio Flow that contains your IVR (optional) and terminates with a `Send to Flex` widget. You can clone the default  `Webchat Flow` to start with. 
 
