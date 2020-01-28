@@ -1,5 +1,7 @@
 # Integrating a custom web chat channel in Flex 
 
+For more information about this repository, have a look at [this blog post](https://www.twilio.com/blog/add-custom-chat-channel-twilio-flex)
+
 ## Implementation
 
 ### Sending Message
