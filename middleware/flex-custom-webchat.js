@@ -8,7 +8,7 @@ const client = require('twilio')(
   process.env.TWILIO_AUTH_TOKEN
 );
 
-var flexChannel;
+var flexChannel = false;
 
 function sendChatMessage(serviceSid, channelSid, chatUserName, body) {
   console.log('Sending new chat message');
@@ -67,6 +67,10 @@ function createNewChannel(flexFlowSid, flexChatService, chatUserName) {
     });
 }
 
+async function resetChannel() {
+  flexChannel = false;
+}
+
 async function sendMessageToFlex(msg) {
   if (!flexChannel) {
     flexChannel = await createNewChannel(
@@ -83,4 +87,5 @@ async function sendMessageToFlex(msg) {
   );
 }
 
-module.exports = sendMessageToFlex;
+exports.sendMessageToFlex = sendMessageToFlex;
+exports.resetChannel = resetChannel;
