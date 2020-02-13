@@ -32,8 +32,9 @@ app.post('/new-message', function(request, response) {
 
 app.post('/channel-update', function(request, response) {
   console.log('Twilio channel update webhook fired');
-  console.log('Channel Status: ' + JSON.parse(request.body.Attributes).status)
-  flex.resetChannel();
+  let status = JSON.parse(request.body.Attributes).status;
+  console.log('Channel Status: ' + status);
+  flex.resetChannel(status);
   response.sendStatus(200);
 });
 
