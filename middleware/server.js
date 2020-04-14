@@ -8,7 +8,7 @@ require('dotenv').load();
 const http = require('http');
 const express = require('express');
 const ngrok = require('ngrok');
-const sendMessageToFlex = require('./flex-custom-webchat');
+const flex = require('./flex-custom-webchat');
 
 // Create Express webapp and connect socket.io
 var app = express();
@@ -32,14 +32,16 @@ app.post('/new-message', function(request, response) {
 
 app.post('/channel-update', function(request, response) {
   console.log('Twilio channel update webhook fired');
-  console.log('Channel Status: ' + JSON.parse(request.body.Attributes).status)
+  let status = JSON.parse(request.body.Attributes).status;
+  console.log('Channel Status: ' + status);
+  flex.resetChannel(status);
   response.sendStatus(200);
 });
 
 io.on('connection', function(socket) {
   console.log('User connected');
   socket.on('chat message', function(msg) {
-    sendMessageToFlex(msg);
+    flex.sendMessageToFlex(msg);
     io.emit('chat message', msg);
   });
 });
