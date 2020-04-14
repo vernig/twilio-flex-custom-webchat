@@ -23,7 +23,7 @@
     "twilio": "^3.0.0-rc.16"
   },
   "devDependencies": {
-    "nodemon": "^1.19.2"
+    "nodemon": "^2.0.3"
   },
   "nodemonConfig": {
     "ignore": [
