@@ -38,28 +38,48 @@ function createNewChannel(flexFlowSid, flexChatService, chatUserName) {
       identity: chatUserName,
       chatUserFriendlyName: chatUserName,
       chatFriendlyName: 'Flex Custom Chat',
-      target: chatUserName
+      target: chatUserName,
+      taskAttributes:{
+        conversationSID:"12345"
+      },
+      longLived: true
     })
     .then(channel => {
+      console.log(channel);
       console.log(`Created new channel ${channel.sid}`);
+     
       return client.chat
         .services(flexChatService)
         .channels(channel.sid)
-        .webhooks.create({
-          type: 'webhook',
-          'configuration.method': 'POST',
-          'configuration.url': `${process.env.WEBHOOK_BASE_URL}/new-message?channel=${channel.sid}`,
-          'configuration.filters': ['onMessageSent']
+        .webhooks.list()
+        .then(webhooks =>{
+          console.log(webhooks);
+          if (webhooks.lenth >0){
+            console.log(webhooks.length);
+            return
+          }
+          return client.chat
+          .services(flexChatService)
+          .channels(channel.sid)
+          .webhooks.create({
+            type: 'webhook',
+            'configuration.method': 'POST',
+            'configuration.url': `${process.env.WEBHOOK_BASE_URL}/new-message?channel=${channel.sid}`,
+            'configuration.filters': ['onMessageSent']
+          })
+          .then(() => client.chat
+          .services(flexChatService)
+          .channels(channel.sid)
+          .webhooks.create({
+            type: 'webhook',
+            'configuration.method': 'POST',
+            'configuration.url': `${process.env.WEBHOOK_BASE_URL}/channel-update`,
+            'configuration.filters': ['onChannelUpdated']
+          }))
+
         })
-        .then(() => client.chat
-        .services(flexChatService)
-        .channels(channel.sid)
-        .webhooks.create({
-          type: 'webhook',
-          'configuration.method': 'POST',
-          'configuration.url': `${process.env.WEBHOOK_BASE_URL}/channel-update`,
-          'configuration.filters': ['onChannelUpdated']
-        }))
+
+ 
     })
     .then(webhook => webhook.channelSid)
     .catch(error => {
@@ -81,6 +101,7 @@ async function sendMessageToFlex(msg) {
       'custom-chat-user'
     );
   }
+  console.log("Created channel ", flexChannelCreated);
   sendChatMessage(
     process.env.FLEX_CHAT_SERVICE,
     flexChannelCreated,
