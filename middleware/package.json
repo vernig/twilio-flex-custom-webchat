@@ -19,7 +19,7 @@
     "express": "^4.15.2",
     "ngrok": "^3.2.5",
     "node-fetch": "^2.6.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "twilio": "^3.0.0-rc.16"
   },
   "devDependencies": {
