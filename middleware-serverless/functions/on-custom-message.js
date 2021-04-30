@@ -151,7 +151,7 @@ async function sendChatMessage(serviceSid, channelSid, chatUserName, body) {
       headers: {
         "X-Twilio-Webhook-Enabled": "true",
         Authorization: `Basic ${base64.encode(
-          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
+          `${process.env.ACCOUNT_SID}:${process.env.AUTH_TOKEN}`
         )}`,
       },
     }
