@@ -23,6 +23,22 @@ async function saveChannelSid(fromNumber, flexChannelCreatedSid, client) {
     });
 }
 
+async function removeChannelKey(fromNumber, client){
+  return client.sync
+    .services(syncServiceSid)
+    .syncMaps(syncMapSid)
+    .syncMapItems(fromNumber)
+    .remove()
+    .then((resp)=>{
+      console.log("deleted",resp);
+      return;
+    })
+    .catch((err)=>{
+      console.log("Couldn't delete", err);
+      return;
+    });
+}
+
 async function getChannelSid(fromNumber, client) {
   console.log("Getting channel SID for ", fromNumber);
 
@@ -79,8 +95,32 @@ async function createNewChannel(flexFlowSid, flexChatService, chatUserName, clie
     target: chatUserName,
   });
   console.log(`Created new channel ${newChannelCreated.sid}`);
+  console.log('Channel details', newChannelCreated );
   
-  if (newChannelCreated){
+  // let webhooks = await client.chat.services(flexChatService).channels(newChannelCreated.sid).webhooks.list();
+  // webhooks.forEach(w => {
+  //   console.log('w',w);
+  // });
+  let webhooks = await getChannelWebhooks(flexChatService, newChannelCreated.sid, client);
+  console.log("webhooks", webhooks.length);
+  let assignWebhooks = true;
+  if (webhooks.length){
+    console.log('running checks');
+    for (let i = 0; i<webhooks.length; i++){
+      if (webhooks[i].configuration && webhooks[i].configuration.filters){
+        console.log(webhooks[i])
+        let filters = webhooks[i].configuration.filters;
+        if (filters.includes('onMessageSent')){
+          assignWebhooks = false;
+          newChannelSid = newChannelCreated.sid;
+          break;
+        }
+      }
+    }
+  }
+
+  console.log(newChannelCreated, assignWebhooks);
+  if (newChannelCreated && assignWebhooks){
     console.log("setting webhooks");
     let webhook1 = await client.chat.services(flexChatService).channels(newChannelCreated.sid).webhooks.create({
       type: "webhook",
@@ -102,5 +142,17 @@ async function createNewChannel(flexFlowSid, flexChatService, chatUserName, clie
   
 }
 
+async function getChannelWebhooks(flexChatService, channelSid, client){
+  return client.chat.services(flexChatService).channels(channelSid).webhooks.list({limit: 10})
+  .then((webhooks)=>{
+    
+    return webhooks;
+  })
+  .catch((err)=>{
+    console.log("couldn't get webhooks");
+    return null
+  })
+}
 
-module.exports =  {saveChannelSid, getChannelSid, getChannelStatus, createNewChannel};
+
+module.exports =  {saveChannelSid, getChannelSid, getChannelStatus, createNewChannel, removeChannelKey};
